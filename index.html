@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscador Animado</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: url('imagen/lsm.png') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px;
+      background: rgba(0,0,0,0.7); /* MÁS OSCURO */
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      font-size: 36px;
+      text-shadow: 3px 3px 0 #000;
+    }
+
+    .L { color: #ff3b3b; }
+    .S { color: #00c853; }
+    .M { color: #ffd600; }
+
+    input {
+      width: 300px;
+      padding: 12px;
+      border-radius: 20px;
+      border: none;
+      font-size: 16px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .buttons {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    button {
+      padding: 12px 22px;
+      border: none;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+      font-size: 14px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    button:nth-child(1) {
+      background: linear-gradient(45deg, #ff3b3b, #ff0000);
+    }
+
+    button:nth-child(2) {
+      background: linear-gradient(45deg, #00c853, #00e676);
+    }
+
+    button:nth-child(3) {
+      background: linear-gradient(45deg, #ffd600, #ffea00);
+      color: black;
+    }
+
+    button:hover {
+      transform: scale(1.15);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    #mensaje {
+      margin-top: 10px;
+      color: yellow;
+      height: 20px;
+      font-weight: bold;
+    }
+
+    #ayuda {
+      display: none;
+      margin-top: 15px;
+      background: rgba(0,0,0,0.85);
+      padding: 15px;
+      border-radius: 15px;
+      color: white;
+    }
+
+    video {
+      margin-top: 20px;
+      width: 320px;
+      display: none;
+      border-radius: 15px;
+      border: 4px solid white;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>
+    <span class="L">L</span>engua de 
+    <span class="S">S</span>eñas 
+    <span class="M">M</span>exicana
+  </h1>
+
+  <input type="text" id="search" placeholder="Escribe: hola, buenos días...">
+
+  <div class="buttons">
+    <button onclick="buscar()">Buscar</button>
+    <button onclick="limpiar()">Limpiar</button>
+    <button onclick="mostrarAyuda()">Ayuda</button>
+  </div>
+
+  <p id="mensaje"></p>
+  <div id="ayuda"></div>
+  <video id="video" controls></video>
+</div>
+
+<script>
+  const archivos = {
+    "hola": "videos/hola.mp4",
+    "todos": "videos/todos.mp4",
+    "buenos dias": "videos/buenos_dias.mp4",
+    "buenas tardes": "videos/buenas_tardes.mp4",
+    "buenas noches": "videos/buenas_noches.mp4",
+    "bien": "videos/bien.mp4",
+    "estoy bien": "videos/estoy_bien.mp4",
+
+    "gracias": "videos/gracias.mp4",
+    "como estas": "videos/como_estas.mp4"
+  };
+
+  function normalizar(texto) {
+    return texto.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function buscar() {
+    const input = normalizar(document.getElementById("search").value.trim());
+    const video = document.getElementById("video");
+    const mensaje = document.getElementById("mensaje");
+
+    video.pause();
+    video.currentTime = 0;
+    video.style.display = "none";
+
+    if (archivos[input]) {
+      video.src = archivos[input];
+      video.style.display = "block";
+      video.play();
+      mensaje.textContent = "";
+    } else {
+      mensaje.textContent = "No se encontró contenido";
+    }
+  }
+
+  function limpiar() {
+    const video = document.getElementById("video");
+    const input = document.getElementById("search");
+    const mensaje = document.getElementById("mensaje");
+    const ayuda = document.getElementById("ayuda");
+
+    video.pause();
+    video.currentTime = 0;
+    video.src = "";
+    video.style.display = "none";
+
+    input.value = "";
+    mensaje.textContent = "";
+    ayuda.style.display = "none";
+    ayuda.innerHTML = "";
+  }
+
+  function mostrarAyuda() {
+    const ayuda = document.getElementById("ayuda");
+
+    ayuda.style.display = "block";
+    ayuda.innerHTML = `
+      Si la palabra que buscas no está disponible, puedes solicitarla.
+      <br><br>
+      <b>Correo:</b> magisterrosales@gmail.com
+      <br><br>
+      <button onclick="cerrarAyuda()" style="
+        padding:8px 20px;
+        border:none;
+        border-radius:10px;
+        background:#ffd600;
+        color:black;
+        cursor:pointer;
+        font-weight:bold;
+      ">OK</button>
+    `;
+  }
+
+  function cerrarAyuda() {
+    const ayuda = document.getElementById("ayuda");
+    ayuda.style.display = "none";
+    ayuda.innerHTML = "";
+  }
+
+  document.getElementById("search").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") buscar();
+  });
+
+  // Protección básica
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("keydown", function(e) {
+    if (
+      e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && e.key === "I") ||
+      (e.ctrlKey && e.key === "u")
+    ) {
+      e.preventDefault();
+    }
+  });
+</script>
+
+</body>
+</html>
